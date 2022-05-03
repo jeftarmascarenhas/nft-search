@@ -2,13 +2,16 @@ import { useState } from "react";
 import useWeb3 from "./useWeb3";
 import monsterSuitContract from "../contracts/contractAbi.json";
 
-const contractAddress = "0x5267F4183868F0BFF6f95B7Ba70c9f0193E645C0";
 const useContract = () => {
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [nftInfos, setNftInfos] = useState({
+    name: "",
+    description: "",
+  });
   const { contract } = useWeb3({
     contractABI: monsterSuitContract.abi,
-    contractAddress,
+    contractAddress: monsterSuitContract.address,
   });
 
   const searchNFTByAddress = async (address) => {
@@ -16,6 +19,7 @@ const useContract = () => {
       setLoading(true);
       const list = [];
       const balanceOf = await contract.methods.balanceOf(address).call();
+      const nftName = await contract.methods.name().call();
 
       for (let i = 0; i < balanceOf; i++) {
         const tokenId = await contract.methods
@@ -34,17 +38,25 @@ const useContract = () => {
           id: i,
           ...response,
         });
-
-        setLoading(false);
       }
-      setNfts(list);
+
+      if (list.length) {
+        const nft = list[0];
+        setNfts(list);
+        setNftInfos({
+          name: nftName,
+          description: nft.description,
+        });
+      }
+
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
     }
   };
 
-  return { searchNFTByAddress, nfts, loading };
+  return { searchNFTByAddress, nfts, loading, nftInfos };
 };
 
 export default useContract;
