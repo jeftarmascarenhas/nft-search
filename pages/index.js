@@ -5,6 +5,8 @@ import Link from "next/link";
 import useContract from "../hooks/useContract";
 import Web3 from "web3";
 
+// 0x4d3aEa11554847241E884f595d3d1BAdB4a1B0aE
+
 export default function Home() {
   const { searchNFTByAddress, nfts, loading, nftInfos } = useContract();
 
